@@ -794,8 +794,14 @@ define(function LiveDevelopment(require, exports, module) {
          * the status accordingly.
          */
         function cleanup() {
-            _setStatus(STATUS_INACTIVE, reason || "explicit_close");
-            deferred.resolve();
+            NativeApp.closeLiveBrowser().done(function () {
+                _setStatus(STATUS_INACTIVE, reason || "explicit_close");
+                deferred.resolve();
+            }).fail(function () {
+                _setStatus(STATUS_INACTIVE, reason || "explicit_close");
+                deferred.resolve();
+            });
+
         }
 
         if (_openDeferred) {

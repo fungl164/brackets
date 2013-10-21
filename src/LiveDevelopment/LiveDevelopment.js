@@ -794,14 +794,18 @@ define(function LiveDevelopment(require, exports, module) {
          * the status accordingly.
          */
         function cleanup() {
-            NativeApp.closeLiveBrowser().done(function () {
+            // Need to do this in order to trigger the corresponding CloseLiveBrowser cleanups required on the native Mac side
+            var closeDeferred = (brackets.platform === "mac") ? NativeApp.closeLiveBrowser() : $.Deferred().resolve();
+            closeDeferred.done(function () {
                 _setStatus(STATUS_INACTIVE, reason || "explicit_close");
                 deferred.resolve();
-            }).fail(function () {
+            }).fail(function (err) {
+                if (err) {
+                    reason +=  " (" + err + ")";
+                }
                 _setStatus(STATUS_INACTIVE, reason || "explicit_close");
                 deferred.resolve();
             });
-
         }
 
         if (_openDeferred) {

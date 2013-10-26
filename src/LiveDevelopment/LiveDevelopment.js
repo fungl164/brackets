@@ -795,7 +795,8 @@ define(function LiveDevelopment(require, exports, module) {
          */
         function cleanup() {
             // Need to do this in order to trigger the corresponding CloseLiveBrowser cleanups required on the native Mac side
-            var closeDeferred = (brackets.platform === "mac") ? NativeApp.closeLiveBrowser() : $.Deferred().resolve();
+            //var closeDeferred = (brackets.platform === "mac") ? NativeApp.closeLiveBrowser() : $.Deferred().resolve();
+            var closeDeferred = NativeApp.closeLiveBrowser();
             closeDeferred.done(function () {
                 _setStatus(STATUS_INACTIVE, reason || "explicit_close");
                 deferred.resolve();
@@ -1039,7 +1040,7 @@ define(function LiveDevelopment(require, exports, module) {
                     if (id === Dialogs.DIALOG_BTN_OK) {
                         // User has chosen to reload Chrome, quit the running instance
                         _setStatus(STATUS_INACTIVE);
-                        NativeApp.closeLiveBrowser()
+                        _close()
                             .done(function () {
                                 browserStarted = false;
                                 window.setTimeout(function () {
@@ -1054,7 +1055,17 @@ define(function LiveDevelopment(require, exports, module) {
                                 _openDeferred.reject("CLOSE_LIVE_BROWSER");
                             });
                     } else {
-                        _openDeferred.reject("CANCEL");
+                        _close()
+                            .done(function () {
+                                browserStarted = false;
+                                _openDeferred.reject("CANCEL");
+                            })
+                            .fail(function (err) {
+                                // Report error?
+                                _setStatus(STATUS_ERROR);
+                                browserStarted = false;
+                                _openDeferred.reject("CLOSE_LIVE_BROWSER");
+                            });
                     }
                 });
 

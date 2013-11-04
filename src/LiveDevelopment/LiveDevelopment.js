@@ -794,9 +794,9 @@ define(function LiveDevelopment(require, exports, module) {
          * the status accordingly.
          */
         function cleanup() {
-            // Need to do this in order to trigger the corresponding CloseLiveBrowser cleanups required on the native Mac side
-            //var closeDeferred = (brackets.platform === "mac") ? NativeApp.closeLiveBrowser() : $.Deferred().resolve();
-            var closeDeferred = NativeApp.closeLiveBrowser();
+            // Need to do this in order to trigger the corresponding CloseLiveBrowser 
+            // cleanups required on the native Mac side
+            var closeDeferred = (brackets.platform === "mac") ? NativeApp.closeLiveBrowser() : $.Deferred().resolve();
             closeDeferred.done(function () {
                 _setStatus(STATUS_INACTIVE, reason || "explicit_close");
                 deferred.resolve();
